@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Quiz Application</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Online Quiz Application</h1>
+  </header>
+
+  <main class="container">
+    <section id="landing-section" class="card">
+      <h2>Welcome to the quiz!</h2>
+      <p>Test your knowledge with a short quiz about technology.</p>
+      <h3>How to play</h3>
+      <ol class="instructions">
+        <li>Read each question.</li>
+        <li>Select one answer.</li>
+        <li>Click Next to continue.</li>
+      </ol>
+      <button id="start-button" type="button">Start Quiz</button>
+    </section>
+
+    <section id="quiz-section" class="card" hidden>
+      <p id="question-number" class="question-number"></p>
+      <h2 id="question-text"></h2>
+      <div id="options-container" class="options-grid"></div>
+      <button id="next-button" type="button">Next</button>
+    </section>
+
+    <section id="result-section" class="card" hidden>
+      <h2>Quiz completed</h2>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Online Quiz Application</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

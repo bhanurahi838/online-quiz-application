@@ -1,0 +1,145 @@
+[hidden] {
+  display: none !important;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #1f2937;
+  background-color: #f3f6fb;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+button {
+  border: 0;
+  border-radius: 6px;
+  padding: 12px 20px;
+  color: #ffffff;
+  background-color: #2457c5;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1b4298;
+}
+
+button:focus-visible,
+.option-label:focus-within {
+  outline: 3px solid #f0b429;
+  outline-offset: 3px;
+}
+
+/* Header styles */
+.site-header {
+  padding: 20px;
+  color: #ffffff;
+  background-color: #173b82;
+  text-align: center;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+/* Main content and card styles */
+.container {
+  width: min(100% - 32px, 680px);
+  margin: 40px auto;
+  flex: 1;
+}
+
+.card {
+  padding: 28px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.1);
+}
+
+.card h2 {
+  margin-top: 0;
+  line-height: 1.3;
+}
+
+.instructions {
+  margin: 8px 0 24px;
+  padding-left: 24px;
+}
+
+.question-number {
+  margin-top: 0;
+  color: #53627a;
+  font-weight: 700;
+}
+
+/* Answer option styles */
+.options-grid {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.option-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 2px solid #d5dce8;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.option-label:hover {
+  border-color: #2457c5;
+  background-color: #f3f7ff;
+}
+
+.option-label:has(input:checked) {
+  border-width: 3px;
+  border-color: #2457c5;
+  background-color: #e8efff;
+}
+
+.option-label input {
+  flex: 0 0 auto;
+  margin: 5px 0 0;
+}
+
+/* Footer styles */
+.site-footer {
+  padding: 12px 20px;
+  color: #53627a;
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* Small-screen layout */
+@media (max-width: 480px) {
+  .container {
+    margin: 24px auto;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .site-header h1 {
+    font-size: 1.4rem;
+  }
+}
