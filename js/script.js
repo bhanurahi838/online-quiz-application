@@ -1,4 +1,3 @@
-// These sample questions and answer indexes will be used in a later scoring step.
 var questions = [
   {
     question: "Which language is used to add interactivity to web pages?",
@@ -38,6 +37,7 @@ var questions = [
 ];
 
 var currentQuestionIndex = 0;
+var score = 0;
 
 var landingSection = document.getElementById("landing-section");
 var quizSection = document.getElementById("quiz-section");
@@ -45,10 +45,13 @@ var resultSection = document.getElementById("result-section");
 var questionNumber = document.getElementById("question-number");
 var questionText = document.getElementById("question-text");
 var optionsContainer = document.getElementById("options-container");
+var answerMessage = document.getElementById("answer-message");
+var scoreText = document.getElementById("score-text");
 
 // This displays the current question and creates its four radio-button choices.
 function showQuestion() {
   var currentQuestion = questions[currentQuestionIndex];
+  answerMessage.hidden = true;
   questionNumber.textContent =
     "Question " + (currentQuestionIndex + 1) + " of " + questions.length;
   questionText.textContent = currentQuestion.question;
@@ -74,6 +77,7 @@ function showQuestion() {
 // This hides the welcome screen and starts the quiz at its first question.
 function startQuiz() {
   currentQuestionIndex = 0;
+  score = 0;
   landingSection.hidden = true;
   resultSection.hidden = true;
   quizSection.hidden = false;
@@ -82,6 +86,17 @@ function startQuiz() {
 
 // This moves to the next question or shows the completion message at the end.
 function goToNextQuestion() {
+  var selectedOption = document.querySelector('input[name="quiz-answer"]:checked');
+
+  if (selectedOption === null) {
+    answerMessage.hidden = false;
+    return;
+  }
+
+  if (Number(selectedOption.value) === questions[currentQuestionIndex].answer) {
+    score++;
+  }
+
   currentQuestionIndex++;
 
   if (currentQuestionIndex < questions.length) {
@@ -89,8 +104,15 @@ function goToNextQuestion() {
   } else {
     quizSection.hidden = true;
     resultSection.hidden = false;
+    scoreText.textContent = "Your score: " + score + " out of " + questions.length;
   }
+}
+
+// This resets the quiz and shows the first question again.
+function restartQuiz() {
+  startQuiz();
 }
 
 document.getElementById("start-button").addEventListener("click", startQuiz);
 document.getElementById("next-button").addEventListener("click", goToNextQuestion);
+document.getElementById("restart-button").addEventListener("click", restartQuiz);

@@ -83,6 +83,12 @@ button:focus-visible,
   font-weight: 700;
 }
 
+.result-score {
+  color: #53627a;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
 /* Answer option styles */
 .options-grid {
   display: grid;
