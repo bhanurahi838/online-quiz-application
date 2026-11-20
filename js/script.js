@@ -1,43 +1,8 @@
-var questions = [
-  {
-    question: "Which language is used to add interactivity to web pages?",
-    options: ["HTML", "CSS", "JavaScript", "SQL"],
-    answer: 2
-  },
-  {
-    question: "What does HTML stand for?",
-    options: [
-      "HyperText Markup Language",
-      "High Transfer Machine Language",
-      "Hyperlink Text Management Language",
-      "Home Tool Markup Language"
-    ],
-    answer: 0
-  },
-  {
-    question: "Which part of a computer performs most calculations?",
-    options: ["Monitor", "CPU", "Keyboard", "Speaker"],
-    answer: 1
-  },
-  {
-    question: "Which of these is a web browser?",
-    options: ["Linux", "Python", "Google Chrome", "Microsoft Word"],
-    answer: 2
-  },
-  {
-    question: "What does CSS help control on a web page?",
-    options: [
-      "The page's appearance and layout",
-      "The computer's storage",
-      "The internet connection",
-      "The browser's history"
-    ],
-    answer: 0
-  }
-];
-
-var currentQuestionIndex = 0;
+var questions = [];
+var currentQuestion = 0;
 var score = 0;
+var selectedIndex = null;
+var answers = [];
 
 var landingSection = document.getElementById("landing-section");
 var quizSection = document.getElementById("quiz-section");
@@ -47,17 +12,52 @@ var questionText = document.getElementById("question-text");
 var optionsContainer = document.getElementById("options-container");
 var answerMessage = document.getElementById("answer-message");
 var scoreText = document.getElementById("score-text");
+var progressBar = document.getElementById("progress-bar");
+var progressFill = document.getElementById("progress-fill");
+var feedback = document.getElementById("feedback");
+
+// This loads the questions from the backend when the page opens.
+async function loadQuestions() {
+  try {
+    var response = await fetch("/api/questions");
+    if (!response.ok) {
+      throw new Error("The questions could not be loaded.");
+    }
+
+    questions = await response.json();
+  } catch (error) {
+    console.error(error);
+    landingSection.hidden = true;
+    quizSection.hidden = false;
+    feedback.textContent =
+      "Could not load questions. Make sure the backend server is running.";
+  }
+}
 
 // This displays the current question and creates its four radio-button choices.
 function showQuestion() {
-  var currentQuestion = questions[currentQuestionIndex];
+  var questionData = questions[currentQuestion];
+  selectedIndex = null;
   answerMessage.hidden = true;
+  feedback.textContent = "";
   questionNumber.textContent =
-    "Question " + (currentQuestionIndex + 1) + " of " + questions.length;
-  questionText.textContent = currentQuestion.question;
+    "Question " + (currentQuestion + 1) + " of " + questions.length;
+  progressFill.style.width =
+    ((currentQuestion + 1) / questions.length * 100) + "%";
+  progressBar.setAttribute("aria-valuenow", currentQuestion + 1);
+  questionText.textContent = questionData.question;
   optionsContainer.textContent = "";
 
-  for (var optionIndex = 0; optionIndex < currentQuestion.options.length; optionIndex++) {
+  var strayText = questionText.nextSibling;
+  if (
+    strayText &&
+    strayText.nodeType === 3 &&
+    strayText.textContent.trim() === "-"
+  ) {
+    strayText.parentNode.removeChild(strayText);
+  }
+
+  for (var optionIndex = 0; optionIndex < questionData.options.length; optionIndex++) {
     var label = document.createElement("label");
     var radioButton = document.createElement("input");
     var optionText = document.createElement("span");
@@ -66,7 +66,8 @@ function showQuestion() {
     radioButton.type = "radio";
     radioButton.name = "quiz-answer";
     radioButton.value = optionIndex;
-    optionText.textContent = currentQuestion.options[optionIndex];
+    radioButton.addEventListener("change", selectAnswer);
+    optionText.textContent = questionData.options[optionIndex];
 
     label.appendChild(radioButton);
     label.appendChild(optionText);
@@ -76,35 +77,63 @@ function showQuestion() {
 
 // This hides the welcome screen and starts the quiz at its first question.
 function startQuiz() {
-  currentQuestionIndex = 0;
+  if (questions.length === 0) {
+    return;
+  }
+
+  currentQuestion = 0;
   score = 0;
+  answers = [];
   landingSection.hidden = true;
   resultSection.hidden = true;
   quizSection.hidden = false;
   showQuestion();
 }
 
-// This moves to the next question or shows the completion message at the end.
-function goToNextQuestion() {
-  var selectedOption = document.querySelector('input[name="quiz-answer"]:checked');
+// This remembers the selected choice so it can still be changed before Next.
+function selectAnswer(event) {
+  selectedIndex = Number(event.target.value);
+  answerMessage.hidden = true;
+  feedback.textContent = "";
+}
 
-  if (selectedOption === null) {
+// This moves to the next question or shows the completion message at the end.
+async function goToNextQuestion() {
+  if (selectedIndex === null) {
     answerMessage.hidden = false;
     return;
   }
 
-  if (Number(selectedOption.value) === questions[currentQuestionIndex].answer) {
-    score++;
+  answerMessage.hidden = true;
+  feedback.textContent = "";
+  answers[currentQuestion] = selectedIndex;
+
+  if (currentQuestion < questions.length - 1) {
+    selectedIndex = null;
+    currentQuestion++;
+    showQuestion();
+    return;
   }
 
-  currentQuestionIndex++;
+  try {
+    var response = await fetch("/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers: answers })
+    });
 
-  if (currentQuestionIndex < questions.length) {
-    showQuestion();
-  } else {
+    if (!response.ok) {
+      throw new Error("The final score could not be loaded.");
+    }
+
+    var result = await response.json();
+    score = result.score;
     quizSection.hidden = true;
     resultSection.hidden = false;
-    scoreText.textContent = "Your score: " + score + " out of " + questions.length;
+    scoreText.textContent =
+      "Your score: " + result.score + " out of " + result.total;
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -116,3 +145,5 @@ function restartQuiz() {
 document.getElementById("start-button").addEventListener("click", startQuiz);
 document.getElementById("next-button").addEventListener("click", goToNextQuestion);
 document.getElementById("restart-button").addEventListener("click", restartQuiz);
+
+loadQuestions();

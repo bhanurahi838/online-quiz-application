@@ -10,6 +10,15 @@ var scoresFilePath = path.join(__dirname, "scores.json");
 app.use(cors());
 app.use(express.json());
 
+// This serves only the frontend CSS and JavaScript folders.
+app.use("/css", express.static(path.join(__dirname, "..", "css")));
+app.use("/js", express.static(path.join(__dirname, "..", "js")));
+
+// This sends the quiz page when someone opens the home address.
+app.get("/", function (request, response) {
+  response.sendFile(path.join(__dirname, "..", "index.html"));
+});
+
 // This returns saved scores, or an empty list if the file is missing or broken.
 function readScores() {
   try {
@@ -136,12 +145,9 @@ app.post("/api/scores", saveScore);
 // This starts the server and prints its local address.
 function startServer() {
   var port = process.env.PORT || 3000;
-  app.listen(port, showServerAddress);
-}
-
-// This prints the server address after it starts.
-function showServerAddress() {
-  console.log("Server running on http://localhost:3000");
+  app.listen(port, function () {
+    console.log("Server running on http://localhost:" + port);
+  });
 }
 
 startServer();

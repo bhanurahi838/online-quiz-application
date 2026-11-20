@@ -26,8 +26,12 @@
 
     <section id="quiz-section" class="card" hidden>
       <p id="question-number" class="question-number"></p>
-      <h2 id="question-text"></h2>
+      <div id="progress-bar" class="progress-bar" role="progressbar" aria-label="Quiz progress" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <h2 id="question-text"></h2>-
       <div id="options-container" class="options-grid"></div>
+      <p id="feedback" class="feedback-message" aria-live="polite"></p>
       <p id="answer-message" hidden>Please select an answer</p>
       <button id="next-button" type="button">Next</button>
     </section>
@@ -35,7 +39,7 @@
     <section id="result-section" class="card" hidden>
       <h2>Quiz completed</h2>
       <p id="score-text" class="result-score"></p>
-      <button id="restart-button" type="button">Restart Quiz</button>
+      <button id="restart-button" type="button">Try Again</button>
     </section>
   </main>
 
