@@ -6,6 +6,8 @@ var questions = require("./questions").questions;
 
 var app = express();
 var scoresFilePath = path.join(__dirname, "scores.json");
+var bcrypt = require("bcryptjs");
+var USERS_FILE = path.join(__dirname, "users.json");
 
 app.use(cors());
 app.use(express.json());
@@ -141,7 +143,40 @@ app.get("/api/scores", getScores);
 
 // Route for checking and saving a new score.
 app.post("/api/scores", saveScore);
+// --- LOGIN CODE ---
+function readUsers() {
+  try {
+    if (!fs.existsSync(USERS_FILE)) return [];
+    return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+  } catch (e) { return []; }
+}
+function writeUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
 
+app.post("/api/signup", async function(req, res) {
+  var name = req.body.name;
+  var email = req.body.email;
+  var password = req.body.password;
+  if (!name || !email || !password) return res.status(400).json({ message: "Sab kuch bharo" });
+  var users = readUsers();
+  if (users.find(function(u){ return u.email === email; })) return res.status(400).json({ message: "Email pehle se hai" });
+  var hashed = await bcrypt.hash(password, 10);
+  users.push({ name: name, email: email, password: hashed });
+  writeUsers(users);
+  res.status(201).json({ message: "Signup ho gaya!", name: name, email: email });
+});
+
+app.post("/api/login", async function(req, res) {
+  var email = req.body.email;
+  var password = req.body.password;
+  var users = readUsers();
+  var user = users.find(function(u){ return u.email === email; });
+  if (!user) return res.status(400).json({ message: "User nahi mila" });
+  var match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(400).json({ message: "Password galat hai" });
+  res.json({ message: "Login ho gaya!", name: user.name, email: user.email });
+});
 // This starts the server and prints its local address.
 function startServer() {
   var port = process.env.PORT || 3000;

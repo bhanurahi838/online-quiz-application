@@ -147,3 +147,39 @@ document.getElementById("next-button").addEventListener("click", goToNextQuestio
 document.getElementById("restart-button").addEventListener("click", restartQuiz);
 
 loadQuestions();
+// --- AUTH JS ---
+var loginBtn = document.getElementById("login-btn");
+var signupBtn = document.getElementById("signup-btn");
+
+if (loginBtn) {
+  loginBtn.onclick = async function() {
+    var email = document.getElementById("auth-email").value;
+    var password = document.getElementById("auth-password").value;
+    var res = await fetch("http://localhost:3000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var data = await res.json();
+    document.getElementById("auth-msg").innerText = data.message;
+    if (res.ok) {
+      document.getElementById("welcome-msg").innerText = "Welcome, " + data.name + "!";
+      document.getElementById("auth-section").style.display = "none";
+    }
+  };
+}
+
+if (signupBtn) {
+  signupBtn.onclick = async function() {
+    var name = document.getElementById("auth-name").value;
+    var email = document.getElementById("auth-email").value;
+    var password = document.getElementById("auth-password").value;
+    var res = await fetch("http://localhost:3000/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, email: email, password: password })
+    });
+    var data = await res.json();
+    document.getElementById("auth-msg").innerText = data.message;
+  };
+}
