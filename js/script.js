@@ -165,6 +165,7 @@ if (loginBtn) {
     if (res.ok) {
       document.getElementById("welcome-msg").innerText = "Welcome, " + data.name + "!";
       document.getElementById("auth-section").style.display = "none";
+      document.getElementById("landing-section").classList.remove("hidden");
     }
   };
 }
